@@ -5,9 +5,9 @@ const clientId = process.env.TWITCH_CLIENT_ID;
 const clientSecret = process.env.TWITCH_CLIENT_SECRET;
 
 if (!clientId || !clientSecret) {
-	throw new Error("Missing Twitch API credentials");
+  throw new Error("Missing Twitch API credentials");
 }
 
 export const twitchApi = new ApiClient({
-	authProvider: new AppTokenAuthProvider(clientId, clientSecret),
+  authProvider: new AppTokenAuthProvider(clientId, clientSecret),
 });
