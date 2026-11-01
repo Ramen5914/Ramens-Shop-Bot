@@ -7,6 +7,7 @@ import {
   ModalBuilder,
   type ModalSubmitInteraction,
   PermissionFlagsBits,
+  type Role,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
@@ -17,7 +18,7 @@ import {
   SlashGroup,
   SlashOption,
 } from "discordx";
-import { listTwitchNotifications } from "../../services/notificationStore.js";
+import { listTwitchNotifications } from "../../services/database.js";
 import { updateTwitchNotification } from "../../services/twitchNotifications.js";
 
 const modalId = "twitch-edit-modal";
@@ -32,7 +33,7 @@ export class TwitchEditCommand {
   @Slash({
     name: "edit",
     description: "Edit a Twitch stream start message",
-    defaultMemberPermissions: PermissionFlagsBits.ManageGuild,
+    defaultMemberPermissions: PermissionFlagsBits.Administrator,
   })
   @SlashGroup("twitch")
   async twitchEdit(
@@ -58,6 +59,13 @@ export class TwitchEditCommand {
       },
     })
     streamer: string,
+    @SlashOption({
+      name: "role",
+      description: "Optional replacement role to mention when live",
+      type: ApplicationCommandOptionType.Role,
+      required: false,
+    })
+    role: Role | undefined,
     interaction: CommandInteraction,
   ): Promise<void> {
     if (!interaction.inGuild()) {
@@ -82,7 +90,9 @@ export class TwitchEditCommand {
     }
 
     const modal = new ModalBuilder()
-      .setCustomId(`${modalId}:${login}`)
+      .setCustomId(
+        `${modalId}:${login}:${role?.id ?? tracked.roleId ?? "none"}`,
+      )
       .setTitle(`Edit ${login} message`)
       .addComponents(
         new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -109,13 +119,20 @@ export class TwitchEditCommand {
       return;
     }
 
-    const login = interaction.customId.slice(`${modalId}:`.length);
+    const [, login, selectedRole] = interaction.customId.split(":");
     const message = interaction.fields.getTextInputValue("message").trim();
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     try {
-      const updated = await updateTwitchNotification(login, message);
+      const roleId = selectedRole === "none" ? null : selectedRole;
+
+      if (roleId && !(await interaction.guild?.roles.fetch(roleId))) {
+        await interaction.editReply("The selected Discord role was not found.");
+        return;
+      }
+
+      const updated = await updateTwitchNotification(login, message, roleId);
       await interaction.editReply(
         updated
           ? `Updated the stream start message for **${login}**.`

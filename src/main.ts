@@ -3,7 +3,8 @@ import {
   Events,
   IntentsBitField,
   type Interaction,
-  type Message,
+  MessageFlags,
+  PermissionFlagsBits,
 } from "discord.js";
 import { Client } from "discordx";
 import { startTwitchNotifications } from "./services/twitchNotifications.js";
@@ -15,20 +16,11 @@ export const bot = new Client({
   // Discord intents
   intents: [
     IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.GuildMembers,
-    IntentsBitField.Flags.GuildMessages,
-    IntentsBitField.Flags.GuildMessageReactions,
     IntentsBitField.Flags.GuildVoiceStates,
-    IntentsBitField.Flags.MessageContent,
   ],
 
   // Debug logs are disabled in silent mode
   silent: false,
-
-  // Configuration for @SimpleCommand
-  simpleCommand: {
-    prefix: "!",
-  },
 });
 
 bot.once(Events.ClientReady, async () => {
@@ -36,7 +28,10 @@ bot.once(Events.ClientReady, async () => {
   // await bot.guilds.fetch();
 
   // Synchronize applications commands with Discord
-  void bot.initApplicationCommands();
+  const guildIds = bot.guilds.cache.map((guild) => guild.id);
+  await bot.clearApplicationCommands(...guildIds);
+  await bot.clearApplicationCommands();
+  await bot.initApplicationCommands();
 
   await startTwitchNotifications(bot);
 
@@ -49,12 +44,30 @@ bot.once(Events.ClientReady, async () => {
   console.log("Bot started");
 });
 
-bot.on("interactionCreate", (interaction: Interaction) => {
-  bot.executeInteraction(interaction);
-});
+bot.on("interactionCreate", async (interaction: Interaction) => {
+  const isTwitchCommand =
+    (interaction.isChatInputCommand() || interaction.isAutocomplete()) &&
+    interaction.commandName === "twitch";
+  const isTwitchModal =
+    interaction.isModalSubmit() && interaction.customId.startsWith("twitch-");
 
-bot.on("messageCreate", (message: Message) => {
-  void bot.executeCommand(message);
+  if (
+    (isTwitchCommand || isTwitchModal) &&
+    (!interaction.inGuild() ||
+      !interaction.memberPermissions?.has(PermissionFlagsBits.Administrator))
+  ) {
+    if (interaction.isAutocomplete()) {
+      await interaction.respond([]);
+    } else {
+      await interaction.reply({
+        content: "You need Administrator permission to use Twitch commands.",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+    return;
+  }
+
+  await bot.executeInteraction(interaction);
 });
 
 async function run() {

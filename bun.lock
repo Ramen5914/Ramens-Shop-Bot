@@ -6,7 +6,6 @@
       "name": "ramens-shop-bot",
       "dependencies": {
         "@discordx/importer": "^1.3.3",
-        "@discordx/pagination": "^4.4.2",
         "@libsql/client": "^0.18.0",
         "@twurple/api": "^8.2.0",
         "@twurple/auth": "^8.2.0",
@@ -79,8 +78,6 @@
     "@discordx/importer": ["@discordx/importer@1.3.3", "", { "dependencies": { "glob": "^11.0.3" } }, "sha512-4fp4/jc4/CET2vKUQCpv9CJg8GAjBOD0HXCdODJtxWYAMh2SoDKEIh83LP99PV996b1pSXGEvka4j+djRfJHZg=="],
 
     "@discordx/internal": ["@discordx/internal@1.2.0", "", {}, "sha512-UVWR3ZmIlLti9O45Xft2aVQ3fiI420hrC14oInDoirCjgYCyVyOGEITyCnTfCf/O1tILYpWi3PD6Bp2gmsT+jQ=="],
-
-    "@discordx/pagination": ["@discordx/pagination@4.4.2", "", { "dependencies": { "lodash": "^4.18.1" }, "peerDependencies": { "discord.js": ">=14 || ^14.0.0-dev" } }, "sha512-0VuNSfVTWj7UqQVDrk1NrNoHxEAerJ4nfCulY6YqFEvqebBm35S6APmUhWJek1I4PpGuyu+BivjlQ4aL59uQjQ=="],
 
     "@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.28.2", "", { "os": "aix", "cpu": "ppc64" }, "sha512-XExcO+dvLKvVtNTibSTBej1NCAbaGhWn9Ww1ZPx80qsahhPFe/8jgWP0IchNe0F3HwkU7n8ejhH8bjonqht8mQ=="],
 

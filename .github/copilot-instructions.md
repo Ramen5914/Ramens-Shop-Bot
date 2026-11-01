@@ -13,7 +13,7 @@
 ## Architecture
 
 - This is an ESM TypeScript Discord bot built with `discord.js` and `discordx`. `src/main.ts` constructs the Discord client, configures intents and the `!` simple-command prefix, dynamically imports `src/events` and `src/commands`, synchronizes application commands on `ClientReady`, and routes interactions/messages to discordx.
-- Decorators are the registration mechanism. New command/event modules under `src/commands` or `src/events` are discovered by the `importx` glob; they do not need a central registry or manual import. Existing starter/example modules also register real Discord commands, so account for or remove them when changing the command surface.
+- Decorators are the registration mechanism. New command/event modules under `src/commands` or `src/events` are discovered by the `importx` glob; they do not need a central registry or manual import.
 - Twitch integration has two paths. `src/services/twitchApi.ts` exports a shared Twurple `ApiClient` used by the Twitch test command; `src/services/twitchNotifications.ts` creates the EventSub client and manages SQLite-backed streamer subscriptions and the global notification channel.
 - `src/utils/twitchMessage.ts` is the shared presentation boundary for Twitch notifications. Both the background notifier and `/twitch-test` should use `buildTwitchLiveMessage` rather than duplicating embed/content construction.
 - `BOT_TOKEN`, `TWITCH_CLIENT_ID`, and `TWITCH_CLIENT_SECRET` are required at runtime. Missing credentials fail startup/module initialization; Docker passes them through from the host environment.

@@ -12,7 +12,7 @@ services:
       - TWITCH_CLIENT_SECRET=${TWITCH_CLIENT_SECRET}
       - TWITCH_ACCESS_TOKEN=${TWITCH_ACCESS_TOKEN}
       - TWITCH_REFRESH_TOKEN=${TWITCH_REFRESH_TOKEN}
-      - SQLITE_PATH=${SQLITE_PATH:-data/notifications.db}
+      - SQLITE_PATH=${SQLITE_PATH:-data/bot.db}
     develop:
       watch:
         - action: sync+restart

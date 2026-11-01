@@ -4,7 +4,7 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup } from "discordx";
-import { listTwitchNotifications } from "../../services/notificationStore.js";
+import { listTwitchNotifications } from "../../services/database.js";
 
 @Discord()
 @SlashGroup({
@@ -16,7 +16,7 @@ export class TwitchListCommand {
   @Slash({
     name: "list",
     description: "List tracked Twitch streamers",
-    defaultMemberPermissions: PermissionFlagsBits.ManageGuild,
+    defaultMemberPermissions: PermissionFlagsBits.Administrator,
   })
   @SlashGroup("twitch")
   async twitchList(interaction: CommandInteraction): Promise<void> {

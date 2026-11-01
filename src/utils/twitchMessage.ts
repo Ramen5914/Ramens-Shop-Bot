@@ -4,6 +4,7 @@ export interface TwitchLiveMessageData {
   login: string;
   displayName: string;
   message?: string;
+  roleId?: string | null;
   title: string;
   gameName?: string;
   imageUrl?: string;
@@ -29,8 +30,13 @@ export function buildTwitchLiveMessage(data: TwitchLiveMessageData) {
   }
 
   return {
-    content: data.message || `${data.displayName} just went live! ${streamUrl}`,
+    content: `${data.roleId ? `<@&${data.roleId}> ` : ""}${
+      data.message || `${data.displayName} just went live! ${streamUrl}`
+    }`,
     embeds: [embed],
-    allowedMentions: { parse: [] as never[] },
+    allowedMentions: {
+      parse: [],
+      roles: data.roleId ? [data.roleId] : [],
+    },
   };
 }

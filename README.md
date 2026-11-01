@@ -36,9 +36,9 @@
   </p>
 </div>
 
-# 📖 Introduction
+# Ramen's Shop Bot
 
-A starter template equipped with several interaction commands and one event.
+A Discord bot for Twitch stream notifications.
 
 # 🏗 Development
 
@@ -100,16 +100,20 @@ TWITCH_REFRESH_TOKEN=...
 ```
 
 `TWITCH_ACCESS_TOKEN` and `TWITCH_REFRESH_TOKEN` must come from a Twitch user OAuth
-flow for the account used to create the EventSub subscriptions. Notification
-subscriptions are stored in `data/notifications.db` (or `SQLITE_PATH`) and persist
-across restarts.
+flow for the account used to create the EventSub subscriptions. The shared SQLite
+database is stored in `data/bot.db` (or `SQLITE_PATH`) and persists across
+restarts. It contains a generic `config` table for global settings and separate
+service tables such as `twitch_notifications`.
 
 Members with **Manage Server** can use `/twitch channel` to configure the global
 text or announcement channel, then use `/twitch add` to open a modal for the
 Twitch username and custom notification message. `/twitch test` also uses this
 global channel. `/twitch list` shows tracked streamers, and `/twitch remove`
 provides autocomplete choices from the tracked streamers before removing one.
-Use `/twitch edit` to update a tracked streamer's stream start message.
+Use `/twitch edit` to update a tracked streamer's stream start message and
+optionally choose a replacement Discord role. The add and edit commands accept
+the role through Discord's native role selector; that role is mentioned before
+the stored message when the streamer goes live.
 The existing `ramen5914` subscription is seeded into a new database on first
 startup.
 

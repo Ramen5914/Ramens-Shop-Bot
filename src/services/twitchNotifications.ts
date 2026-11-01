@@ -6,19 +6,22 @@ import type { Client } from "discordx";
 import { buildTwitchLiveMessage } from "../utils/twitchMessage.js";
 import {
   removeTwitchNotification as deleteTwitchNotification,
-  getNotificationChannel,
+  getConfigValue,
   listTwitchNotifications,
-  setNotificationChannel as saveNotificationChannel,
   addTwitchNotification as saveTwitchNotification,
   updateTwitchNotification as saveUpdatedTwitchNotification,
+  setConfigValue,
   type TwitchNotification,
-} from "./notificationStore.js";
+} from "./database.js";
 
 let started = false;
 let api: ApiClient;
 let listener: EventSubWsListener;
 let notificationClient: Client;
-const messages = new Map<string, string>();
+const notifications = new Map<
+  string,
+  { message: string; roleId: string | null }
+>();
 const subscribedLogins = new Set<string>();
 const subscriptions = new Map<
   string,
@@ -32,32 +35,41 @@ export async function addTwitchNotification(
   const saved = await saveTwitchNotification({
     twitchLogin: login,
     message: notification.message,
+    roleId: notification.roleId,
   });
 
   if (!saved) return false;
 
-  messages.set(login, notification.message);
+  notifications.set(login, {
+    message: notification.message,
+    roleId: notification.roleId,
+  });
 
   if (started) {
-    await registerSubscription(login, notification.message);
+    await registerSubscription(login, notification);
   }
 
   return true;
 }
 
 export async function setNotificationChannel(channelId: string): Promise<void> {
-  await saveNotificationChannel(channelId);
+  await setConfigValue("twitch.notification_channel_id", channelId);
 }
 
 export async function updateTwitchNotification(
   login: string,
   message: string,
+  roleId: string | null,
 ): Promise<boolean> {
   const normalizedLogin = login.trim().toLowerCase();
-  const updated = await saveUpdatedTwitchNotification(normalizedLogin, message);
+  const updated = await saveUpdatedTwitchNotification(
+    normalizedLogin,
+    message,
+    roleId,
+  );
 
   if (updated) {
-    messages.set(normalizedLogin, message);
+    notifications.set(normalizedLogin, { message, roleId });
   }
 
   return updated;
@@ -71,7 +83,7 @@ export async function removeTwitchNotification(
 
   if (!removed) return false;
 
-  messages.delete(normalizedLogin);
+  notifications.delete(normalizedLogin);
   subscribedLogins.delete(normalizedLogin);
   subscriptions.get(normalizedLogin)?.stop();
   subscriptions.delete(normalizedLogin);
@@ -81,7 +93,7 @@ export async function removeTwitchNotification(
 export async function getConfiguredNotificationChannel(): Promise<
   string | undefined
 > {
-  return getNotificationChannel();
+  return getConfigValue("twitch.notification_channel_id");
 }
 
 export async function startTwitchNotifications(client: Client): Promise<void> {
@@ -140,7 +152,10 @@ export async function startTwitchNotifications(client: Client): Promise<void> {
 
   for (const notification of await listTwitchNotifications()) {
     const login = notification.twitchLogin.trim().toLowerCase();
-    messages.set(login, notification.message);
+    notifications.set(login, {
+      message: notification.message,
+      roleId: notification.roleId,
+    });
   }
 
   async function registerSubscriptions(): Promise<void> {
@@ -152,8 +167,11 @@ export async function startTwitchNotifications(client: Client): Promise<void> {
       scope: [],
     });
 
-    for (const [login, message] of messages) {
-      await registerSubscription(login, message);
+    for (const [login, notification] of notifications) {
+      await registerSubscription(login, {
+        twitchLogin: login,
+        ...notification,
+      });
     }
 
     console.log(`Twitch EventSub is authenticated as user ${userId}.`);
@@ -170,7 +188,7 @@ export async function startTwitchNotifications(client: Client): Promise<void> {
 
 async function registerSubscription(
   login: string,
-  message: string,
+  notification: TwitchNotification,
 ): Promise<void> {
   if (subscribedLogins.has(login)) return;
 
@@ -184,7 +202,15 @@ async function registerSubscription(
   }
 
   const subscription = listener.onStreamOnline(user.id, (event) => {
-    void sendNotification(login, event.broadcasterDisplayName, message, event);
+    void sendNotification(
+      login,
+      event.broadcasterDisplayName,
+      {
+        twitchLogin: login,
+        ...(notifications.get(login) ?? notification),
+      },
+      event,
+    );
   });
   subscribedLogins.add(login);
   subscriptions.set(login, subscription);
@@ -194,7 +220,7 @@ async function registerSubscription(
 async function sendNotification(
   login: string,
   displayName: string,
-  message: string,
+  notification: TwitchNotification,
   event: Parameters<Parameters<typeof listener.onStreamOnline>[1]>[0],
 ): Promise<void> {
   let channelInfo: Awaited<ReturnType<typeof api.channels.getChannelInfoById>> =
@@ -210,7 +236,7 @@ async function sendNotification(
     console.error(`Could not load Twitch channel details for ${login}:`, error);
   }
 
-  const channelId = await getNotificationChannel();
+  const channelId = await getConfigValue("twitch.notification_channel_id");
   if (!channelId) {
     console.error("No global Twitch notification channel is configured.");
     return;
@@ -237,7 +263,8 @@ async function sendNotification(
       buildTwitchLiveMessage({
         login,
         displayName,
-        message,
+        message: notification.message,
+        roleId: notification.roleId,
         title: stream?.title ?? channelInfo?.title ?? "Watch live on Twitch",
         gameName: stream?.gameName ?? channelInfo?.gameName,
         imageUrl: thumbnailUrl?.toString(),

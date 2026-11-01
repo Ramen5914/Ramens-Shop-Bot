@@ -7,7 +7,7 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
-import { listTwitchNotifications } from "../../services/notificationStore.js";
+import { listTwitchNotifications } from "../../services/database.js";
 import { twitchApi } from "../../services/twitchApi.js";
 import { getConfiguredNotificationChannel } from "../../services/twitchNotifications.js";
 import { buildTwitchLiveMessage } from "../../utils/twitchMessage.js";
@@ -22,7 +22,7 @@ export class TwitchTestCommand {
   @Slash({
     name: "test",
     description: "Send a test Twitch live notification",
-    defaultMemberPermissions: PermissionFlagsBits.ManageGuild,
+    defaultMemberPermissions: PermissionFlagsBits.Administrator,
   })
   @SlashGroup("twitch")
   async twitchTest(
@@ -114,6 +114,7 @@ export class TwitchTestCommand {
           login,
           displayName: user.displayName,
           message: trackedStreamer.message,
+          roleId: trackedStreamer.roleId,
           title: "Test stream - checking my Twitch notification!",
           gameName: "Just Chatting",
           imageUrl,

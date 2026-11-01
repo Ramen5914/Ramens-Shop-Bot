@@ -6,7 +6,7 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
-import { listTwitchNotifications } from "../../services/notificationStore.js";
+import { listTwitchNotifications } from "../../services/database.js";
 import { removeTwitchNotification } from "../../services/twitchNotifications.js";
 
 @Discord()
@@ -19,7 +19,7 @@ export class TwitchRemoveCommand {
   @Slash({
     name: "remove",
     description: "Remove a tracked Twitch streamer",
-    defaultMemberPermissions: PermissionFlagsBits.ManageGuild,
+    defaultMemberPermissions: PermissionFlagsBits.Administrator,
   })
   @SlashGroup("twitch")
   async twitchRemove(

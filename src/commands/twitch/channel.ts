@@ -19,7 +19,7 @@ export class TwitchChannelCommand {
   @Slash({
     name: "channel",
     description: "Set the global Twitch notification channel",
-    defaultMemberPermissions: PermissionFlagsBits.ManageGuild,
+    defaultMemberPermissions: PermissionFlagsBits.Administrator,
   })
   @SlashGroup("twitch")
   async twitchChannel(
