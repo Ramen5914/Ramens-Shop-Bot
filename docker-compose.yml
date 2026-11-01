@@ -1,7 +1,26 @@
-version: "3"
 services:
   app:
-    build: .
-    command: node build/main.js
+    build:
+      context: .
+      target: dev-runner
+    command: bun run dev
+    volumes:
+      - ./data:/app/data
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
+      - TWITCH_CLIENT_ID=${TWITCH_CLIENT_ID}
+      - TWITCH_CLIENT_SECRET=${TWITCH_CLIENT_SECRET}
+      - TWITCH_ACCESS_TOKEN=${TWITCH_ACCESS_TOKEN}
+      - TWITCH_REFRESH_TOKEN=${TWITCH_REFRESH_TOKEN}
+      - SQLITE_PATH=${SQLITE_PATH:-data/notifications.db}
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./src
+          target: /app/src
+        - action: rebuild
+          path: ./package.json
+        - action: rebuild
+          path: ./bun.lock
+        - action: rebuild
+          path: ./tsconfig.json
