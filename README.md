@@ -43,16 +43,16 @@ A starter template equipped with several interaction commands and one event.
 # 🏗 Development
 
 ```
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 # 💻 Production
 
 ```
-npm install --production
-npm run build
-npm run start
+bun install --production
+bun run build
+bun run start
 ```
 
 # 🐋 Docker
@@ -75,7 +75,43 @@ To view your application's logs:
 docker-compose logs
 ```
 
+For development with Compose Watch:
+
+```
+docker compose watch
+```
+
+Source changes are synchronized into the development container and restart the
+bot through `tsx`. Changes to dependencies or TypeScript configuration rebuild
+the container. The SQLite database remains persisted in `./data`.
+
 For the full command list please view the [Docker Documentation](https://docs.docker.com/engine/reference/commandline/cli/).
+
+## Twitch notifications
+
+Live notifications use Twitch EventSub over WebSockets instead of polling. Set these
+environment variables before starting the bot:
+
+```
+TWITCH_CLIENT_ID=...
+TWITCH_CLIENT_SECRET=...
+TWITCH_ACCESS_TOKEN=...
+TWITCH_REFRESH_TOKEN=...
+```
+
+`TWITCH_ACCESS_TOKEN` and `TWITCH_REFRESH_TOKEN` must come from a Twitch user OAuth
+flow for the account used to create the EventSub subscriptions. Notification
+subscriptions are stored in `data/notifications.db` (or `SQLITE_PATH`) and persist
+across restarts.
+
+Members with **Manage Server** can use `/twitch channel` to configure the global
+text or announcement channel, then use `/twitch add` to open a modal for the
+Twitch username and custom notification message. `/twitch test` also uses this
+global channel. `/twitch list` shows tracked streamers, and `/twitch remove`
+provides autocomplete choices from the tracked streamers before removing one.
+Use `/twitch edit` to update a tracked streamer's stream start message.
+The existing `ramen5914` subscription is seeded into a new database on first
+startup.
 
 # 📜 Documentation
 
