@@ -8,6 +8,7 @@ services:
       - "8787:8787"
     volumes:
       - ./data:/app/data
+      - ./bot.private-key.pem:/app/bot.private-key.pem:ro
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
       - TWITCH_CLIENT_ID=${TWITCH_CLIENT_ID}
@@ -15,6 +16,11 @@ services:
       - TWITCH_ACCESS_TOKEN=${TWITCH_ACCESS_TOKEN}
       - TWITCH_REFRESH_TOKEN=${TWITCH_REFRESH_TOKEN}
       - SQLITE_PATH=${SQLITE_PATH:-data/bot.db}
+      - GITHUB_APP_ID=${GITHUB_APP_ID}
+      - GITHUB_INSTALLATION_ID=${GITHUB_INSTALLATION_ID}
+      - GITHUB_APP_PRIVATE_KEY_FILE=/app/bot.private-key.pem
+      - GITHUB_WEBHOOK_PORT=${GITHUB_WEBHOOK_PORT:-8787}
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
       - TZ=America/Los_Angeles
     develop:
       watch:
