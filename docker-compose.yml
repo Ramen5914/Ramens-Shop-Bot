@@ -21,6 +21,7 @@ services:
       - GITHUB_APP_PRIVATE_KEY_FILE=/app/bot.private-key.pem
       - GITHUB_WEBHOOK_PORT=${GITHUB_WEBHOOK_PORT:-8787}
       - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+      - DB_FILE_NAME=${DB_FILE_NAME}
       - TZ=America/Los_Angeles
     develop:
       watch:
