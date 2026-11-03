@@ -4,6 +4,8 @@ services:
       context: .
       target: dev-runner
     command: bun run dev
+    ports:
+      - "8787:8787"
     volumes:
       - ./data:/app/data
     environment:
