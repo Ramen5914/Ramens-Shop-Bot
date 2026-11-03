@@ -13,6 +13,7 @@ services:
       - TWITCH_ACCESS_TOKEN=${TWITCH_ACCESS_TOKEN}
       - TWITCH_REFRESH_TOKEN=${TWITCH_REFRESH_TOKEN}
       - SQLITE_PATH=${SQLITE_PATH:-data/bot.db}
+      - TZ=America/Los_Angeles
     develop:
       watch:
         - action: sync+restart
