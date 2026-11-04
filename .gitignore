@@ -1,5 +1,6 @@
 # files
 .vscode
+.zed
 .env
 .env.local
 **/*.pem
