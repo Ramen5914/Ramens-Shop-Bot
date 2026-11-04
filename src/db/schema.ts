@@ -35,8 +35,6 @@ export const voiceChatGeneratorsTable = sqliteTable(
   {
     channelId: text().primaryKey(),
     categoryId: text().notNull(),
-    name: text().notNull().default("Joice to Create Voice Chat"),
-    size: int().notNull().default(-1),
   },
 );
 
