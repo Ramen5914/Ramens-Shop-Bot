@@ -31,7 +31,7 @@ export const trackedStreamersTable = sqliteTable(
 );
 
 export const voiceChatGeneratorsTable = sqliteTable(
-  "voice_char_generators_table",
+  "voice_chat_generators_table",
   {
     channelId: text().primaryKey(),
     categoryId: text().notNull(),
