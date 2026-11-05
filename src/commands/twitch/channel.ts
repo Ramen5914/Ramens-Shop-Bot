@@ -7,6 +7,7 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
+import { logger } from "../../logger.js";
 import { setNotificationChannel } from "../../services/twitchNotifications.js";
 
 @Discord()
@@ -63,7 +64,10 @@ export class TwitchChannelCommand {
         flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
-      console.error("Failed to set Twitch notification channel:", error);
+      logger.error(
+        { error, command: "twitch channel" },
+        "Failed to set Twitch notification channel",
+      );
       await interaction.reply({
         content: "Couldn't save the notification channel.",
         flags: MessageFlags.Ephemeral,
