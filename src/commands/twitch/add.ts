@@ -18,6 +18,7 @@ import {
   SlashGroup,
   SlashOption,
 } from "discordx";
+import { logger } from "../../logger.js";
 import { twitchApi } from "../../services/twitchApi.js";
 import { addTwitchNotification } from "../../services/twitchNotifications.js";
 
@@ -137,7 +138,10 @@ export class TwitchAddCommand {
           : `Notifications for **${user.displayName}** are already configured.`,
       );
     } catch (error) {
-      console.error("Failed to add Twitch notification:", error);
+      logger.error(
+        { error, command: "twitch add" },
+        "Failed to add Twitch notification",
+      );
       await interaction.editReply(
         "Couldn't save that notification. Check the bot logs for details.",
       );
