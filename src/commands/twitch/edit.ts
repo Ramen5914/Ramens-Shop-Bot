@@ -18,6 +18,7 @@ import {
   SlashGroup,
   SlashOption,
 } from "discordx";
+import { logger } from "../../logger.js";
 import { listTwitchNotifications } from "../../services/database.js";
 import { updateTwitchNotification } from "../../services/twitchNotifications.js";
 
@@ -139,7 +140,10 @@ export class TwitchEditCommand {
           : `**${login}** is no longer tracked.`,
       );
     } catch (error) {
-      console.error("Failed to update Twitch notification:", error);
+      logger.error(
+        { error, command: "twitch edit" },
+        "Failed to update Twitch notification",
+      );
       await interaction.editReply(
         "Couldn't update that notification. Check the bot logs for details.",
       );
