@@ -77,7 +77,54 @@ export function startGithubWebhookServer() {
 }
 
 async function handlePushWebhook(data: EmitterWebhookEvent<"push">["payload"]) {
-  logger.info(data.sender);
+  const mod = await getModFromGitRepoName(data.repository.name);
+
+  if (!mod) {
+    return;
+  }
+
+  const match = data.ref.match(/^refs\/heads\/(?<branch>.+)$/);
+  const branch = match?.groups?.branch;
+
+  const num = data.commits.length;
+
+  let description = "";
+  for (const commit of data.commits) {
+    let message = commit.message;
+    if (message.length > 50) {
+      message = `${message.slice(0, 47)}...`;
+    }
+
+    description += `[\`${commit.id.slice(0, 7)}\`](${commit.url}) ${message} - ${commit.author.username}\n`;
+  }
+
+  const embed = new EmbedBuilder()
+    .setColor(0x7289da)
+    .setAuthor({
+      name: `${data.sender?.login}`,
+      iconURL: `${data.sender?.avatar_url}`,
+    })
+    .setTitle(
+      `[${data.repository.name}:${branch}] ${num} new ${num !== 1 ? "commits" : "commit"}`,
+    )
+    .setDescription(description)
+    .setURL(data.repository.html_url);
+
+  const channel = await bot.channels.fetch(mod.githubUpdatesChannel);
+
+  if (
+    !channel ||
+    (channel.type !== ChannelType.GuildText &&
+      channel.type !== ChannelType.GuildAnnouncement)
+  ) {
+    throw new Error(
+      `Invalid Minecraft mod github channel: ${mod.githubUpdatesChannel}`,
+    );
+  }
+
+  channel.send({
+    embeds: [embed],
+  });
 }
 
 async function handleStarWebhook(data: EmitterWebhookEvent<"star">["payload"]) {
@@ -127,6 +174,7 @@ async function handleReleaseWebhook(
   }
 
   const embed = new EmbedBuilder()
+    .setColor(data.release.prerelease ? 0xd29922 : 0x3fb950)
     .setAuthor({
       name: `${data.release.author?.login}`,
       iconURL: `${data.release.author?.avatar_url}`,
