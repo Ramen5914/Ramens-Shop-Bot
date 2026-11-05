@@ -79,36 +79,70 @@ export function startGithubWebhookServer() {
 async function handlePushWebhook(data: EmitterWebhookEvent<"push">["payload"]) {
   const mod = await getModFromGitRepoName(data.repository.name);
 
-  if (!mod) {
-    return;
-  }
+  if (!mod) return;
 
-  const match = data.ref.match(/^refs\/heads\/(?<branch>.+)$/);
-  const branch = match?.groups?.branch;
+  // Ignore tag and pull-request refs; only handle branches.
+  if (!data.ref?.startsWith("refs/heads/")) return;
 
-  const num = data.commits.length;
+  const branch = data.ref.replace(/^refs\/heads\//, "");
 
-  let description = "";
-  for (const commit of data.commits) {
-    let message = commit.message;
-    if (message.length > 50) {
-      message = `${message.slice(0, 47)}...`;
+  const embed = new EmbedBuilder().setColor(0x7289da);
+
+  if (data.deleted) {
+    embed
+      .setColor(0xeb6420)
+      .setTitle(`[${data.repository.full_name}] Deleted branch: ${branch}`)
+      .setURL(data.repository.html_url);
+  } else if (data.created) {
+    embed
+      .setColor(0x009800)
+      .setTitle(`[${data.repository.full_name}] New branch created: ${branch}`)
+      .setURL(`${data.repository.html_url}/tree/${encodeURIComponent(branch)}`);
+  } else if (data.forced) {
+    embed
+      .setColor(0xfc2929)
+      .setTitle(
+        `[${data.repository.name}] Branch ${branch} was force-pushed to ${data.after.slice(0, 7)}`,
+      )
+      .setURL(
+        `${data.repository.html_url}/compare/${data.before.slice(0, 12)}...${data.after.slice(0, 12)}`,
+      )
+      .setDescription(
+        `[Compare changes](${data.repository.html_url}/compare/${data.before.slice(0, 12)}...${data.after.slice(0, 12)})`,
+      );
+  } else {
+    const commits = data.commits ?? [];
+
+    if (commits.length === 0) return;
+
+    let description = "";
+
+    for (const commit of commits) {
+      let message = commit.message.split("\n")[0];
+
+      if (message.length > 50) {
+        message = `${message.slice(0, 47)}...`;
+      }
+
+      description += `[\`${commit.id.slice(0, 7)}\`](${commit.url}) ${message} - ${commit.author.username}\n`;
     }
 
-    description += `[\`${commit.id.slice(0, 7)}\`](${commit.url}) ${message} - ${commit.author.username}\n`;
+    embed
+      .setTitle(
+        `[${data.repository.name}:${branch}] ${commits.length} new ${
+          commits.length === 1 ? "commit" : "commits"
+        }`,
+      )
+      .setURL(
+        `${data.repository.html_url}/compare/${data.before.slice(0, 12)}...${data.after.slice(0, 12)}`,
+      )
+      .setDescription(description);
   }
 
-  const embed = new EmbedBuilder()
-    .setColor(0x7289da)
-    .setAuthor({
-      name: `${data.sender?.login}`,
-      iconURL: `${data.sender?.avatar_url}`,
-    })
-    .setTitle(
-      `[${data.repository.name}:${branch}] ${num} new ${num !== 1 ? "commits" : "commit"}`,
-    )
-    .setDescription(description)
-    .setURL(data.repository.html_url);
+  embed.setAuthor({
+    name: data.sender?.login ?? "Unknown user",
+    iconURL: data.sender?.avatar_url,
+  });
 
   const channel = await bot.channels.fetch(mod.githubUpdatesChannel);
 
@@ -122,7 +156,7 @@ async function handlePushWebhook(data: EmitterWebhookEvent<"push">["payload"]) {
     );
   }
 
-  channel.send({
+  await channel.send({
     embeds: [embed],
   });
 }
@@ -180,7 +214,9 @@ async function handleReleaseWebhook(
       iconURL: `${data.release.author?.avatar_url}`,
     })
     .setTitle(
-      `[${data.repository.full_name}] New release published: ${data.release.tag_name}`,
+      `[${data.repository.full_name}] New ${
+        data.release.prerelease ? "pre-release" : "release"
+      } published: ${data.release.tag_name}`,
     )
     .setURL(`${data.release.html_url}`);
 
