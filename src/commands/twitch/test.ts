@@ -7,7 +7,8 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
-import { listTwitchNotifications } from "../../services/database.js";
+import { logger } from "../../logger.js";
+import { listTrackedStreamers } from "../../services/database.js";
 import { twitchApi } from "../../services/twitchApi.js";
 import { getConfiguredNotificationChannel } from "../../services/twitchNotifications.js";
 import { buildTwitchLiveMessage } from "../../utils/twitchMessage.js";
@@ -34,15 +35,17 @@ export class TwitchTestCommand {
       autocomplete: async (interaction: AutocompleteInteraction) => {
         const query =
           interaction.options.getString("streamer")?.trim().toLowerCase() ?? "";
-        const streamers = await listTwitchNotifications();
+        const streamers = await listTrackedStreamers();
 
         await interaction.respond(
           streamers
-            .filter((streamer) => streamer.twitchLogin.includes(query))
+            .filter((streamer) =>
+              streamer.displayName.toLowerCase().includes(query),
+            )
             .slice(0, 25)
             .map((streamer) => ({
-              name: streamer.twitchLogin,
-              value: streamer.twitchLogin,
+              name: streamer.displayName,
+              value: streamer.displayName,
             })),
         );
       },
@@ -59,9 +62,9 @@ export class TwitchTestCommand {
     }
 
     const login = streamer.trim().toLowerCase();
-    const trackedStreamers = await listTwitchNotifications();
+    const trackedStreamers = await listTrackedStreamers();
     const trackedStreamer = trackedStreamers.find(
-      (tracked) => tracked.twitchLogin === login,
+      (tracked) => tracked.displayName.toLowerCase() === login,
     );
 
     if (!trackedStreamer) {
@@ -125,7 +128,10 @@ export class TwitchTestCommand {
         `Test notification sent to <#${channel.id}>.`,
       );
     } catch (error) {
-      console.error("Failed to send Twitch test notification:", error);
+      logger.error(
+        { error, command: "twitch test" },
+        "Failed to send Twitch test notification",
+      );
       await interaction.editReply(
         "Couldn't send the test. Check that I have View Channel, " +
           "Send Messages, and Embed Links permissions in that channel.",

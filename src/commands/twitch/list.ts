@@ -4,7 +4,8 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup } from "discordx";
-import { listTwitchNotifications } from "../../services/database.js";
+import { logger } from "../../logger.js";
+import { listTrackedStreamers } from "../../services/database.js";
 
 @Discord()
 @SlashGroup({
@@ -29,13 +30,13 @@ export class TwitchListCommand {
     }
 
     try {
-      const notifications = await listTwitchNotifications();
+      const notifications = await listTrackedStreamers();
       const content =
         notifications.length > 0
           ? `Tracked Twitch streamers:\n${notifications
               .map(
                 (notification) =>
-                  `- **${notification.twitchLogin}**${
+                  `- **${notification.displayName}**${
                     notification.message ? ` — ${notification.message}` : ""
                   }`,
               )
@@ -44,7 +45,10 @@ export class TwitchListCommand {
 
       await interaction.reply({ content, flags: MessageFlags.Ephemeral });
     } catch (error) {
-      console.error("Failed to list Twitch notifications:", error);
+      logger.error(
+        { error, command: "twitch list" },
+        "Failed to list Twitch notifications",
+      );
       await interaction.reply({
         content: "Couldn't load the tracked streamers.",
         flags: MessageFlags.Ephemeral,

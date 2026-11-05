@@ -6,7 +6,8 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
-import { listTwitchNotifications } from "../../services/database.js";
+import { logger } from "../../logger.js";
+import { listTrackedStreamers } from "../../services/database.js";
 import { removeTwitchNotification } from "../../services/twitchNotifications.js";
 
 @Discord()
@@ -31,15 +32,17 @@ export class TwitchRemoveCommand {
       autocomplete: async (interaction: AutocompleteInteraction) => {
         const query =
           interaction.options.getString("streamer")?.trim().toLowerCase() ?? "";
-        const streamers = await listTwitchNotifications();
+        const streamers = await listTrackedStreamers();
 
         await interaction.respond(
           streamers
-            .filter((streamer) => streamer.twitchLogin.includes(query))
+            .filter((streamer) =>
+              streamer.displayName.toLowerCase().includes(query),
+            )
             .slice(0, 25)
             .map((streamer) => ({
-              name: streamer.twitchLogin,
-              value: streamer.twitchLogin,
+              name: streamer.displayName,
+              value: streamer.displayName,
             })),
         );
       },
@@ -64,7 +67,10 @@ export class TwitchRemoveCommand {
         flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
-      console.error("Failed to remove Twitch notification:", error);
+      logger.error(
+        { error, command: "twitch remove" },
+        "Failed to remove Twitch notification",
+      );
       await interaction.reply({
         content: "Couldn't remove that streamer.",
         flags: MessageFlags.Ephemeral,
