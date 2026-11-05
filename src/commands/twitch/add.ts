@@ -126,7 +126,7 @@ export class TwitchAddCommand {
       }
 
       const added = await addTwitchNotification({
-        twitchLogin: login,
+        displayName: user.displayName,
         message,
         roleId: selectedRoleId,
       });
