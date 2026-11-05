@@ -19,7 +19,7 @@ import {
   SlashOption,
 } from "discordx";
 import { logger } from "../../logger.js";
-import { listTwitchNotifications } from "../../services/database.js";
+import { listTrackedStreamers } from "../../services/database.js";
 import { updateTwitchNotification } from "../../services/twitchNotifications.js";
 
 const modalId = "twitch-edit-modal";
@@ -46,15 +46,17 @@ export class TwitchEditCommand {
       autocomplete: async (interaction: AutocompleteInteraction) => {
         const query =
           interaction.options.getString("streamer")?.trim().toLowerCase() ?? "";
-        const streamers = await listTwitchNotifications();
+        const streamers = await listTrackedStreamers();
 
         await interaction.respond(
           streamers
-            .filter((streamer) => streamer.twitchLogin.includes(query))
+            .filter((streamer) =>
+              streamer.displayName.toLowerCase().includes(query),
+            )
             .slice(0, 25)
             .map((streamer) => ({
-              name: streamer.twitchLogin,
-              value: streamer.twitchLogin,
+              name: streamer.displayName,
+              value: streamer.displayName,
             })),
         );
       },
@@ -78,8 +80,8 @@ export class TwitchEditCommand {
     }
 
     const login = streamer.trim().toLowerCase();
-    const tracked = (await listTwitchNotifications()).find(
-      (notification) => notification.twitchLogin === login,
+    const tracked = (await listTrackedStreamers()).find(
+      (notification) => notification.displayName.toLowerCase() === login,
     );
 
     if (!tracked) {
