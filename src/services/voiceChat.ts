@@ -1,6 +1,6 @@
 import { ChannelType, type VoiceChannel, type VoiceState } from "discord.js";
 import type { Client } from "discordx";
-import { logger } from "../logger.js";
+import { logger } from "@/logger.js";
 import {
   addVoiceChatGenerator,
   listVoiceChatGenerators,

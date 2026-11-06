@@ -3,8 +3,8 @@ import {
   configTable,
   trackedStreamersTable,
   voiceChatGeneratorsTable,
-} from "../db/schema.js";
-import { db } from "../main.js";
+} from "@/db/schema.js";
+import { db } from "@/main.js";
 
 export async function setConfigValue(
   key: string,

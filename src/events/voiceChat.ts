@@ -1,6 +1,6 @@
 import { Events } from "discord.js";
 import { type ArgsOf, Discord, On } from "discordx";
-import { handleVoiceStateUpdate } from "../services/voiceChat.js";
+import { handleVoiceStateUpdate } from "@/services/voiceChat.js";
 
 @Discord()
 export class VoiceChat {

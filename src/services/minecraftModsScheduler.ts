@@ -1,9 +1,9 @@
 import { ChannelType } from "discord.js";
 import { eq } from "drizzle-orm";
-import { minecraftModsTable } from "../db/schema.js";
-import { logger } from "../logger.js";
-import { bot, db } from "../main.js";
-import { buildModInfoMessage } from "../utils/modMessage.js";
+import { minecraftModsTable } from "@/db/schema.js";
+import { logger } from "@/logger.js";
+import { bot, db } from "@/main.js";
+import { buildModInfoMessage } from "@/utils/modMessage.js";
 
 let timer: ReturnType<typeof setTimeout> | undefined;
 const halfHourMs = 30 * 60 * 1000;

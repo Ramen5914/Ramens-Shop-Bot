@@ -1,19 +1,19 @@
 import { EmbedBuilder } from "discord.js";
-import type { minecraftModsTable } from "../db/schema.js";
-import { logger } from "../logger.js";
+import type { minecraftModsTable } from "@/db/schema.js";
+import { logger } from "@/logger.js";
 import {
   getCurseforgeProjectDownloadCount,
   getCurseforgeProjectIconUrl,
-} from "../services/curseforgeApi.js";
+} from "@/services/curseforgeApi.js";
 import {
   getGithubRepoReleaseDownloadCount,
   getRepoDescription,
-} from "../services/githubApi.js";
+} from "@/services/githubApi.js";
 import {
   getModrinthProjectColor,
   getModrinthProjectDownloadCount,
   getModrinthProjectIconUrl,
-} from "../services/modrinthApi.js";
+} from "@/services/modrinthApi.js";
 
 export async function buildModInfoMessage(
   mod: typeof minecraftModsTable.$inferSelect,

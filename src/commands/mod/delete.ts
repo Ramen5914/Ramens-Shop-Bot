@@ -9,8 +9,8 @@ import {
 } from "discord.js";
 import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
 import { eq } from "drizzle-orm";
-import { minecraftModsTable } from "../../db/schema.js";
-import { db } from "../../main.js";
+import { minecraftModsTable } from "@/db/schema.js";
+import { db } from "@/main.js";
 
 @Discord()
 @SlashGroup({

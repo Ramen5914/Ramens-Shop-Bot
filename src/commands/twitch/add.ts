@@ -18,9 +18,9 @@ import {
   SlashGroup,
   SlashOption,
 } from "discordx";
-import { logger } from "../../logger.js";
-import { twitchApi } from "../../services/twitchApi.js";
-import { addTwitchNotification } from "../../services/twitchNotifications.js";
+import { logger } from "@/logger.js";
+import { twitchApi } from "@/services/twitchApi.js";
+import { addTwitchNotification } from "@/services/twitchNotifications.js";
 
 const modalId = "twitch-add-modal";
 

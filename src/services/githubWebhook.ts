@@ -6,9 +6,9 @@ import type {
 } from "@octokit/webhooks/types";
 import { ChannelType, EmbedBuilder } from "discord.js";
 import { eq } from "drizzle-orm";
-import { minecraftModsTable } from "../db/schema.js";
-import { logger } from "../logger.js";
-import { bot, db } from "../main.js";
+import { minecraftModsTable } from "@/db/schema.js";
+import { logger } from "@/logger.js";
+import { bot, db } from "@/main.js";
 
 const port = Number(process.env.GITHUB_WEBHOOK_PORT ?? 8787);
 const secret = getWebhookSecret();

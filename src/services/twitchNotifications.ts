@@ -3,10 +3,10 @@ import { RefreshingAuthProvider } from "@twurple/auth";
 import { EventSubWsListener } from "@twurple/eventsub-ws";
 import { ChannelType } from "discord.js";
 import type { Client } from "discordx";
-import type { trackedStreamersTable } from "../db/schema.js";
-import { logger } from "../logger.js";
-import { ConfigStrings } from "../utils/constants.js";
-import { buildTwitchLiveMessage } from "../utils/twitchMessage.js";
+import type { trackedStreamersTable } from "@/db/schema.js";
+import { logger } from "@/logger.js";
+import { ConfigStrings } from "@/utils/constants.js";
+import { buildTwitchLiveMessage } from "@/utils/twitchMessage.js";
 import {
   addTrackedStreamer,
   getConfigValue,

@@ -6,9 +6,9 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
-import { logger } from "../../logger.js";
-import { listTrackedStreamers } from "../../services/database.js";
-import { removeTwitchNotification } from "../../services/twitchNotifications.js";
+import { logger } from "@/logger.js";
+import { listTrackedStreamers } from "@/services/database.js";
+import { removeTwitchNotification } from "@/services/twitchNotifications.js";
 
 @Discord()
 @SlashGroup({

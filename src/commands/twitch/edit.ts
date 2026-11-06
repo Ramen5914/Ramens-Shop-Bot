@@ -18,9 +18,9 @@ import {
   SlashGroup,
   SlashOption,
 } from "discordx";
-import { logger } from "../../logger.js";
-import { listTrackedStreamers } from "../../services/database.js";
-import { updateTwitchNotification } from "../../services/twitchNotifications.js";
+import { logger } from "@/logger.js";
+import { listTrackedStreamers } from "@/services/database.js";
+import { updateTwitchNotification } from "@/services/twitchNotifications.js";
 
 const modalId = "twitch-edit-modal";
 

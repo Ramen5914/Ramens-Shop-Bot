@@ -4,7 +4,7 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup } from "discordx";
-import { listVoiceChatGenerators as getVoiceChatGenerators } from "../../services/database.js";
+import { listVoiceChatGenerators as GetVoiceChatGenerators } from "@/services/database.js";
 
 @Discord()
 @SlashGroup({
@@ -30,7 +30,7 @@ export class VoiceChatListCommand {
       return;
     }
 
-    const generators = await getVoiceChatGenerators();
+    const generators = await GetVoiceChatGenerators();
     const content =
       generators.length > 0
         ? generators

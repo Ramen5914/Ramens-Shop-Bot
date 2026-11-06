@@ -6,7 +6,7 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
-import { registerVoiceChatGenerator } from "../../services/voiceChat.js";
+import { registerVoiceChatGenerator } from "@/services/voiceChat.js";
 
 @Discord()
 @SlashGroup({

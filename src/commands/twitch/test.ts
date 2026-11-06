@@ -7,11 +7,11 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
-import { logger } from "../../logger.js";
-import { listTrackedStreamers } from "../../services/database.js";
-import { twitchApi } from "../../services/twitchApi.js";
-import { getConfiguredNotificationChannel } from "../../services/twitchNotifications.js";
-import { buildTwitchLiveMessage } from "../../utils/twitchMessage.js";
+import { logger } from "@/logger.js";
+import { listTrackedStreamers } from "@/services/database.js";
+import { twitchApi } from "@/services/twitchApi.js";
+import { getConfiguredNotificationChannel } from "@/services/twitchNotifications.js";
+import { buildTwitchLiveMessage } from "@/utils/twitchMessage.js";
 
 @Discord()
 @SlashGroup({

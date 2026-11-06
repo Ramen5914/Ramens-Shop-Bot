@@ -7,10 +7,10 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
-import { minecraftModsTable } from "../../db/schema.js";
-import { logger } from "../../logger.js";
-import { db } from "../../main.js";
-import { listInstallationRepos } from "../../services/githubApi.js";
+import { minecraftModsTable } from "@/db/schema.js";
+import { logger } from "@/logger.js";
+import { db } from "@/main.js";
+import { listInstallationRepos } from "@/services/githubApi.js";
 
 @Discord()
 @SlashGroup({
